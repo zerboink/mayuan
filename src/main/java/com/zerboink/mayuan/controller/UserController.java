@@ -116,7 +116,7 @@ public class UserController {
         return ResultUtils.success(userList);
     }
 
-    // todo 推荐多个，未实现
+    // 基于redis缓存，前端响应时间为87ms
     @GetMapping("/recommend")
     public BaseResponse<Page<User>> recommendUsers(long pageSize, long pageNum, HttpServletRequest request) {
         User loginUser = userService.getLoginUser(request);
@@ -136,6 +136,15 @@ public class UserController {
         } catch (Exception e) {
             log.error("redis set key error", e);
         }
+        return ResultUtils.success(userPage);
+    }
+
+    // 不采用redis缓存，前端响应时间为122ms
+    @GetMapping("/recommend2")
+    public BaseResponse<Page<User>> recommendUsers2(long pageSize, long pageNum, HttpServletRequest request) {
+        User loginUser = userService.getLoginUser(request);
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        Page<User> userPage = userService.page(new Page<>(pageNum, pageSize), queryWrapper);
         return ResultUtils.success(userPage);
     }
 
